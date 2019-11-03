@@ -34,4 +34,4 @@ NOTE for developers planning to add to the OPmode:
           frMotor.setPower((-(nx - ny) + 0.75 * -x2) * m);
       }
   ```
-Thank you for reading this README and remember programmers. Gracious proffesionalism. Happy developing!
+Thank you for reading this README and remember programmers, gracious proffesionalism. Happy developing!
