@@ -70,7 +70,7 @@ public class DriverMain extends LinearOpMode {
      * Once you've obtained a license key, copy the string from the Vuforia web site
      * and paste it in to your code on the next line, between the double quotes.
      */
-    private static final String VUFORIA_KEY = "Ab0nmoX/////AAAAGbeJ1P4G1E64jrrtI450zd1U87lxHOj9akkdSsxM2egUUijNJboj+0CWTpHtFQkn8cpXWxw3sIdEZYdKvqNSjRi1BeqSZNdhK7oDiGEMoeyNReLItGa0qLSoRwbfhUzWXpp2k/naIkca8YGkv3AMy7i2znvv71hv6qB0qOAn1Kq/axatBXvTozw4pVPvM7cZQ4iH3kjH8Rt/3jnnWJhqYA24w0iE3976fA1mNQIuL0J76rlZXiTNayZwFTu0/jLUfoLcxSKNXeGcnSJHkrxb0b/NH+cB3elIC+cIagGEL/xvDtLpgxOgDLH+TFhnvSuCkoQSKKlsd7r1+MVqIugJJbLfuyQtx+a8GcEmHzD+iK0m";
+    private static final String VUFORIA_KEY = "Insert Key Here";
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
      * localization engine.
