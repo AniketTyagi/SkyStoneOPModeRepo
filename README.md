@@ -13,5 +13,25 @@ NOTE for developers planning to add to the OPmode:
   come out.
 - Try to make your method as independent of external values as possible and more dependent on input variables.
   If that cannot be achieved, remember to document what external variable you are accessing for use and why.
-  
+- The following is an example of a developer method that is in the OPMode:
+  ```java
+  // Function that controls drive base motors for a mecanum-drive
+      // Input-Output Structure: (x1, y1, x2, m, angle-offset) => (void)
+      public void mecanumDrive(double x1, double y1, double x2, double m, double theta) {
+          // x1 and y1 are the x and y values from the joystick which controls the robot's drive
+          // x2 is the x value from the joystick that will control the robot's left-right rotation
+          // m is the speed modifier for the motors, making spin slower or faster
+          // theta is the orientation you would like the robot to be in
+
+          // Finds new orientation coordinates
+          double nx = planarRotation(x1, y1, theta)[0];
+          double ny = planarRotation(x1, y1, theta)[1];
+
+          // Set power to motors accordingly
+          flMotor.setPower((-(nx + ny) + 0.75 * -x2) * m);
+          brMotor.setPower((-(nx + ny) + 0.75 * x2) * m);
+          blMotor.setPower((-(nx - ny) + 0.75 * x2) * m);
+          frMotor.setPower((-(nx - ny) + 0.75 * -x2) * m);
+      }
+  ```
 Thank you for reading this README and remember programmers. Gracious proffesionalism. Happy developing!
