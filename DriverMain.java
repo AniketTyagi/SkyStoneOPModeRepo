@@ -48,11 +48,13 @@ public class DriverMain extends LinearOpMode {
     private DcMotor frMotor, flMotor, brMotor, blMotor, ilMotor, irMotor;
     private Servo udServo, lrServo;
     private DistanceSensor proximFront, proximFront2;
-    private boolean padOneXToggle, padOneAToggle, padOneBToggle, hookCurrentPos, positionMaintain, recordingToggle, reenactToggle;
+    private boolean padOneYToggle, padOneXToggle, padOneAToggle, padOneBToggle, hookCurrentPos, positionMaintain, recordingToggle, reenactToggle;
     private Servo lHook, rHook;
     private double lx, ly, rx, ry, theta, d, offset, lBumper, modTrigLeft, m;
     private List<double[]> recordingData = new ArrayList<double[]>();
-
+    
+    private boolean test;
+    
     // Declare Image Detection members
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Stone";
@@ -70,7 +72,7 @@ public class DriverMain extends LinearOpMode {
      * Once you've obtained a license key, copy the string from the Vuforia web site
      * and paste it in to your code on the next line, between the double quotes.
      */
-    private static final String VUFORIA_KEY = "Insert Key Here";
+    private static final String VUFORIA_KEY = "Ab0nmoX/////AAAAGbeJ1P4G1E64jrrtI450zd1U87lxHOj9akkdSsxM2egUUijNJboj+0CWTpHtFQkn8cpXWxw3sIdEZYdKvqNSjRi1BeqSZNdhK7oDiGEMoeyNReLItGa0qLSoRwbfhUzWXpp2k/naIkca8YGkv3AMy7i2znvv71hv6qB0qOAn1Kq/axatBXvTozw4pVPvM7cZQ4iH3kjH8Rt/3jnnWJhqYA24w0iE3976fA1mNQIuL0J76rlZXiTNayZwFTu0/jLUfoLcxSKNXeGcnSJHkrxb0b/NH+cB3elIC+cIagGEL/xvDtLpgxOgDLH+TFhnvSuCkoQSKKlsd7r1+MVqIugJJbLfuyQtx+a8GcEmHzD+iK0m";
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
      * localization engine.
@@ -94,14 +96,16 @@ public class DriverMain extends LinearOpMode {
         frMotor  = hardwareMap.get(DcMotor.class, "frMotor");
         flMotor = hardwareMap.get(DcMotor.class, "flMotor");
         proximFront = hardwareMap.get(DistanceSensor.class, "pfSensor");
-        /*
-        proximFront2 = hardwareMap.get(DistanceSensor.class, "pf2Sensor");
+        //proximFront2 = hardwareMap.get(DistanceSensor.class, "pf2Sensor");
         ilMotor  = hardwareMap.get(DcMotor.class, "ilMotor");
         irMotor = hardwareMap.get(DcMotor.class, "irMotor");
-        */
+        
         lHook  = hardwareMap.get(Servo.class, "lHook");
         rHook = hardwareMap.get(Servo.class, "rHook");
-
+        
+        // Just a test value, could be used for anything
+        test = true;
+        
         // Toggle values
         positionMaintain = false;
         lBumper = 0;
@@ -118,12 +122,20 @@ public class DriverMain extends LinearOpMode {
         while (opModeIsActive()) {
             // Test Progress (Tested: Will need to be more precise, or have longer process time)
             //vuforiaObjectDetection();
-
-            // Test Progress (Tested: Non-functional and will need to be fixed)
-            if(positionMaintain == false) {offset = 0;}
-            if(Math.abs(offset) > Math.PI * 2) {offset = 0;}
-
+            
+            // Basic Auton 
+            if(test) {  
+                //moveForward(6, 0.15);
+                //moveSideways(6, 0.15);
+                //moveForward(-6, 0.15);
+                //moveSideways(-6, 0.15);
+                test = false;
+            }
+            
+            // Test Progress (Tested: Successful)
             toggleRecording();
+            
+            // Test Progress (Tested: Successful)
             toggleReenacting();
 
             // Test Progress (Tested: Successful: Will add more features)
@@ -140,12 +152,11 @@ public class DriverMain extends LinearOpMode {
             }
 
             // Test Progress (Untested)
-            intakeMotors(intake);
+            intakeMotors(0.6);
             // Test Progress (Tested: Successful)
-            hookServos(45);
+            hookServos(180);
             // Test Progress (Tested: Currently Revising)
             mecanumDrive(rx, ry, lx, m, offset);
-
             // Telemetry values
             logTelemetry();
             telemetry.update();
@@ -210,10 +221,10 @@ public class DriverMain extends LinearOpMode {
         // Adds data to the dataset
         recordingData.add(dataSet);
 
-        // Adds 250ms delay to prevent data overwrite
+        // Adds 100ms delay to prevent data overwrite
         // Might wanna reduce delay in future
         try {
-            Thread.sleep(250);
+            Thread.sleep(100);
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
@@ -282,10 +293,10 @@ public class DriverMain extends LinearOpMode {
                 reenactToggle = false;
             }
 
-            // Adds 250ms delay to prevent data overwrite
+            // Adds 100ms delay to prevent data overwrite
             // Might wanna reduce delay in future
             try {
-                Thread.sleep(250);
+                Thread.sleep(100);
             } catch(InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
@@ -314,10 +325,17 @@ public class DriverMain extends LinearOpMode {
     // Input-Output Structure: (rotation) => (void)
     public void intakeMotors(double rotation) {
         // Setting intake left and right motors both during intake and reenactment
-        if(rotation != 0) {
-            ilMotor.setPower(-rotation);
-            irMotor.setPower(rotation);
+        if(!gamepad1.y) {
+            padOneYToggle = false;
+        } else if (gamepad1.y && padOneYToggle == false){
+            padOneYToggle = true;
+            // Only change intake if you are in op-mode and not reenacting
+            if(reenactToggle == false) {
+                intake = Math.abs(intake - rotation);
+            }
         }
+        ilMotor.setPower(intake);
+        irMotor.setPower(-intake);
     }
 
     // Function that controls the hook servos for the robot
@@ -395,26 +413,114 @@ public class DriverMain extends LinearOpMode {
         return "";
       }
     }
-
-   // Function that acts as alternate method to auton coding through encoder-distance ratios and returns target deltaEncoder
-   // Input-Output Structure: (distance) => (targetDeltaEncoder)
-   public double moveForward(double distance) {
-     // Empirically tested
-     double deltaEncoder = 0;
-     // Empirically tested
-     double deltaDistance = 0;
-     // Uses ratios to determine the target deltaEncoderValue
-     double targetDeltaEncoder = deltaEncoder / deltaDistance * distance;
-     return targetDeltaEncoder;
+    
+    // Function that acts as alternate method to auton coding through encoder-distance ratios and returns target deltaEncoder
+    // Input-Output Structure: (distance, power applied) => (void) 
+    public void moveSideways(double distance, double power) {
+      // Empirically tested deltaEncoder per deltaDistance
+      double deltaEncoder = 1000;
+      // Empirically tested deltaDistance per deltaEncoder
+      double deltaDistance = 17;
+      // Uses ratios to determine the target deltaEncoderValue
+      double targetDeltaEncoder = deltaEncoder / deltaDistance * distance;
+     
+      // Reset motors and encoders
+      brMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      blMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      frMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      flMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+          
+      // Set power to motors for achieved speed
+      brMotor.setPower(-power);
+      blMotor.setPower(power);
+      frMotor.setPower(power);
+      flMotor.setPower(-power);
+     
+      // Rotate Motors to target position
+      brMotor.setTargetPosition(-1 * (int)Math.round(targetDeltaEncoder));
+      blMotor.setTargetPosition((int)Math.round(targetDeltaEncoder));
+      frMotor.setTargetPosition((int)Math.round(targetDeltaEncoder));
+      flMotor.setTargetPosition(-1 * (int)Math.round(targetDeltaEncoder));
+      // Prepare motors for encoder positioning
+      brMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      blMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      frMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      flMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+     
+      // Wait until robot has reached the target position
+      while (opModeIsActive() && blMotor.isBusy()) {
+        telemetry.addData("encoder-fwd", brMotor.getCurrentPosition() + "  busy=" + brMotor.isBusy());
+        telemetry.addData("encoder-fwd", blMotor.getCurrentPosition() + "  busy=" + blMotor.isBusy());
+        telemetry.addData("encoder-fwd", frMotor.getCurrentPosition() + "  busy=" + frMotor.isBusy());
+        telemetry.addData("encoder-fwd", flMotor.getCurrentPosition() + "  busy=" + flMotor.isBusy());
+        telemetry.update();
+        idle();
+      }
+      
+      // Reset motors for regular motion
+      brMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      blMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      frMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      flMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+    // Function that acts as alternate method to auton coding through encoder-distance ratios and returns target deltaEncoder
+    // Input-Output Structure: (distance, power applied) => (void)
+    public void moveForward(double distance, double power) {
+      // Empirically tested
+      double deltaEncoder = 1000;
+      // Empirically tested
+      double deltaDistance = 19;
+      // Uses ratios to determine the target deltaEncoderValue
+      double targetDeltaEncoder = deltaEncoder / deltaDistance * distance;
+     
+      // Reset motors and encoders
+      brMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      blMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      frMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      flMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+          
+      // Set power to motors for achieved speed
+      brMotor.setPower(power);
+      blMotor.setPower(power);
+      frMotor.setPower(power);
+      flMotor.setPower(power);
+     
+      // Rotate Motors to target position
+      brMotor.setTargetPosition(-(int)Math.round(targetDeltaEncoder));
+      blMotor.setTargetPosition((int)Math.round(targetDeltaEncoder));
+      frMotor.setTargetPosition((int)Math.round(targetDeltaEncoder));
+      flMotor.setTargetPosition(-(int)Math.round(targetDeltaEncoder));
+      
+      // Prepare motors for encoder positioning
+      brMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      blMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      frMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      flMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+     
+      // Wait until robot has reached the target position
+      while (opModeIsActive() && brMotor.isBusy()) {
+        telemetry.addData("encoder-fwd", brMotor.getCurrentPosition() + "  busy=" + brMotor.isBusy());
+        telemetry.addData("encoder-fwd", blMotor.getCurrentPosition() + "  busy=" + blMotor.isBusy());
+        telemetry.addData("encoder-fwd", frMotor.getCurrentPosition() + "  busy=" + frMotor.isBusy());
+        telemetry.addData("encoder-fwd", flMotor.getCurrentPosition() + "  busy=" + flMotor.isBusy());
+        telemetry.update();
+        idle();
+      }
+      
+      // Reset motors for regular motion
+      brMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      blMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      frMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      flMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
    }
 
-   // Function that uses Vuforia + Tensorflow to detect the existance of stones, storing the data in an array and returning it for analysis
-   // Input-Output Structure: (void) => (stringData[])
-   public String[] imageRecogFunction() {
+    // Function that uses Vuforia + Tensorflow to detect the existance of stones, storing the data in an array and returning it for analysis
+    // Input-Output Structure: (void) => (stringData[])
+    public String[] imageRecogFunction() {
         // Still in dev stage
         String[] returnValue = {""};
         return returnValue;
-   }
+    }
 
     // Initialize the Vuforia localization engine
     // Input-Output Structure: (void) => (void)
